@@ -2,7 +2,7 @@ name: bot2
 on: [push]
 
 jobs:
-  run-bot1:
+  run-bot2:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
