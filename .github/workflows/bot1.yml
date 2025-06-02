@@ -1,8 +1,8 @@
-name: bot2
+name: bot1
 on: [push]
 
 jobs:
-  run-bot2:
+  run-bot1:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -14,4 +14,4 @@ jobs:
       - name: Install dependencies
         run: pip install python-telegram-bot gTTS
       - name: Run bot
-        run: python bot2.py
+        run: python bot1.py
