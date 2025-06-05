@@ -4,7 +4,7 @@ import requests
 import logging
 
 # Configuración del bot y OpenRouter
-BOT_TOKEN = "7628252959:AAFwWErA6xI5xRHJtgaRB-o-VDHu86C2nFk"
+BOT_TOKEN = "7628252959:AAGJmD9eVM7Y06KruWWkPSiWJU_MOU5xZSI"
 API_KEY = "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"
 MODEL_NAME = "meta-llama/llama-3.2-3b-instruct:free"
 
