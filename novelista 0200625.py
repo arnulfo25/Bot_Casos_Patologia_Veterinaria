@@ -1,7 +1,8 @@
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackContext, filters
-import requests
+import httpx  # Usar httpx para solicitudes asíncronas
 import logging
+import config
 
 # Diccionario de traducciones
 TRANSLATIONS = {
@@ -54,11 +55,6 @@ TRANSLATIONS = {
         'language_changed': "✅ Language changed to English"
     }
 }
-
-# Configuración del bot y OpenRouter
-BOT_TOKEN = "7628252959:AAFwWErA6xI5xRHJtgaRB-o-VDHu86C2nFk"
-API_KEY = "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"
-MODEL_NAME = "qwen/qwen3-235b-a22b:free"
 
 # Configuración del logger
 logging.basicConfig(level=logging.INFO)
@@ -126,41 +122,44 @@ async def generate_story(update: Update, context: CallbackContext) -> None:
             await update.message.reply_text(TRANSLATIONS[lang]['word_count_error'])
             return
 
-        # Llamada a la API de OpenRouter para generar la novela
-        response = requests.post(
-            url="https://openrouter.ai/api/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {API_KEY}",
-                "Content-Type": "application/json"
-            },
-            json={
-                "model": MODEL_NAME,
-                "messages": [
-                    {"role": "system", "content": "Eres un novelista experto en crear historias cortas."},
-                    {
-                        "role": "user",
-                        "content": (
-                            f"Escribe una novela corta de {word_count} palabras.\n"
-                            f"Personajes: {characters}.\n"
-                            f"Categoría: {category}.\n"
-                            f"Tono: {tone}."
-                        )
-                    }
-                ]
-            }
-        )
+        # Llamada asíncrona a la API de OpenRouter
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                url="https://openrouter.ai/api/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {config.OPENROUTER_API_KEY}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": config.MODEL_NAME,
+                    "messages": [
+                        {"role": "system", "content": "Eres un novelista experto en crear historias cortas."},
+                        {
+                            "role": "user",
+                            "content": (
+                                f"Escribe una novela corta de {word_count} palabras.\n"
+                                f"Personajes: {characters}.\n"
+                                f"Categoría: {category}.\n"
+                                f"Tono: {tone}."
+                            )
+                        }
+                    ]
+                },
+                timeout=120
+            )
 
-        response.raise_for_status()
-        result = response.json()
+            response.raise_for_status()
+            result = response.json()
 
-        # Validar la respuesta generada
-        if 'choices' in result and isinstance(result['choices'], list) and len(result['choices']) > 0:
-            story = result['choices'][0]['message']['content']
-            await update.message.reply_text(f"{TRANSLATIONS[lang]['story_prefix']}{story}")
-        else:
-            await update.message.reply_text(TRANSLATIONS[lang]['generation_error'])
+            # Validar la respuesta generada
+            if 'choices' in result and isinstance(result['choices'], list) and len(result['choices']) > 0:
+                story = result['choices'][0]['message']['content']
+                await update.message.reply_text(f"{TRANSLATIONS[lang]['story_prefix']}{story}")
+            else:
+                logger.warning(f"Respuesta inesperada de la API: {result}")
+                await update.message.reply_text(TRANSLATIONS[lang]['generation_error'])
 
-    except requests.exceptions.RequestException as e:
+    except httpx.RequestError as e:
         logger.error(f"Error de conexión con la API: {e}")
         await update.message.reply_text(TRANSLATIONS[lang]['api_error'])
     except Exception as e:
@@ -199,7 +198,7 @@ async def handle_language_selection(update: Update, context: CallbackContext) ->
 
 # Función principal para iniciar el bot
 def main() -> None:
-    application = Application.builder().token(BOT_TOKEN).build()
+    application = Application.builder().token(config.TELEGRAM_TOKEN_NOVELISTA).build()
 
     # Registrar comandos y manejadores
     application.add_handler(CommandHandler('start', start))
