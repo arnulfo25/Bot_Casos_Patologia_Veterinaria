@@ -6,11 +6,14 @@ load_dotenv()
 
 # --- Telegram Bot Configuration ---
 # Obtén tu token de BotFather en Telegram y guárdalo como una variable de entorno
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "81906158555:AAEUfejUULkcjCVc7_PxAjopNA3tUnJnjHV")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 # --- OpenRouter API Configuration ---
 # Obtén tu API Key de https://openrouter.ai/keys y guárdala como una variable de entorno
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "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")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+
+if not TELEGRAM_TOKEN or not OPENROUTER_API_KEY:
+    raise ValueError("Por favor, configura las variables de entorno TELEGRAM_TOKEN y OPENROUTER_API_KEY en un archivo .env o en tu sistema.")
 
 # --- Model and Prompt Configuration ---
 # Modelo a utilizar en OpenRouter. Puedes encontrar más en https://openrouter.ai/models
@@ -26,9 +29,11 @@ TELEGRAM_MAX_MESSAGE_LENGTH = 4096
 PROMPT_TEMPLATE = """
 Basado en el siguiente artículo científico de patología veterinaria:
 
---- INICIO DEL ARTÍCULO ---
+---
+INICIO DEL ARTÍCULO ---
 {text}
---- FIN DEL ARTÍCULO ---
+---
+FIN DEL ARTÍCULO ---
 
 Actúa como un patólogo veterinario experto que está creando un caso de estudio para estudiantes. Genera un caso clínico veterinario que sea atractivo, educativo y fácil de seguir. Usa un tono profesional pero cercano.
 
