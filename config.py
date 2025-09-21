@@ -6,11 +6,11 @@ load_dotenv()
 
 # --- Telegram Bot Configuration ---
 # Obtén tu token de BotFather en Telegram y guárdalo como una variable de entorno
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "8190615854:AAEUfejUULkcjCVc7_PxAjopNA3tUnJnkFA")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "81906158555:AAEUfejUULkcjCVc7_PxAjopNA3tUnJnjHV")
 
 # --- OpenRouter API Configuration ---
 # Obtén tu API Key de https://openrouter.ai/keys y guárdala como una variable de entorno
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "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")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "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")
 
 # --- Model and Prompt Configuration ---
 # Modelo a utilizar en OpenRouter. Puedes encontrar más en https://openrouter.ai/models
